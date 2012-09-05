@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe "runit"
+
 if node["redis2"]["install_from"] == "package"
   include_recipe "redis2::package"
 else

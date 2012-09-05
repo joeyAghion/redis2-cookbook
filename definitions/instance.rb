@@ -48,7 +48,7 @@ define :redis_instance, :port => nil, :data_dir => nil, :master => nil, :service
 
   conf_vars = {
     :conf => conf,
-    :instance_name => params[:name],
+    :instance_name => instance_name,
     :master => params[:master],
   }
 
@@ -60,15 +60,19 @@ define :redis_instance, :port => nil, :data_dir => nil, :master => nil, :service
     notifies :restart, "service[#{instance_name}]"
   end
 
-  uplevel_params = params
+  use_upstart = node[:platform] == "ubuntu" && node[:platform_version].to_f >= 9.10    
 
-  runit_service instance_name do
-    template_name "redis"
+  template "/etc/init/#{instance_name}.conf" do
+    source "redis.upstart.conf.erb"
     cookbook "redis2"
-    options \
-	  :user => node["redis2"]["user"],
-      :config_file => ::File.join(node["redis2"]["conf_dir"], "#{instance_name}.conf"),
-      :timeouts => uplevel_params[:service_timeouts]
+    variables conf_vars
+    mode "0644"
+    only_if { use_upstart }
+  end
+
+  service instance_name do
+    provider Chef::Provider::Service::Upstart if use_upstart
+    action :start
   end
 
 end
