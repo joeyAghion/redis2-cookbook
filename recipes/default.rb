@@ -46,3 +46,17 @@ directory node["redis2"]["log_dir"] do
   owner node["redis2"]["user"]
   mode "0750"
 end
+
+# Set up vm.covercommit_memory correctly - see redis.io/topics/faq
+# under the topic "Background saving is failing with a fork() error 
+# under Linux even if I've a lot of free RAM!" for discussion.
+
+execute "set vm.overcommit_memory=1 in /etc/sysctl.conf" do
+  command "echo 'vm.overcommit_memory=1' >> /etc/sysctl.conf"
+  not_if "grep 'vm.overcommit_memory\s*=\s*1' /etc/sysctl.conf"
+end
+
+execute "set vm.overcommit_memory=1 in current parameter set" do
+  command "sysctl vm.overcommit_memory=1"
+  not_if "sysctl vm.overcommit_memory | grep 1"
+end
