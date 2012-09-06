@@ -114,7 +114,7 @@ dbfilename <%= @conf["dumpdb_filename"] %>
 # Note that you must specify a directory here, not a file name.
 dir <%= @conf["data_dir"] %>
 
-<% if @master.is_a? ::Chef::Node %>
+<% if @master %>
 ################################# REPLICATION #################################
 
 # Master-Slave replication. Use slaveof to make a Redis instance a copy of
@@ -122,15 +122,15 @@ dir <%= @conf["data_dir"] %>
 # so for example it is possible to configure the slave to save the DB with a
 # different interval, or to listen to another port, and so on.
 #
-slaveof <%= @master["ipaddress"] %> <%= critical @master["redis2"]["instances"][@instance_name]["port"] %>
+slaveof <%= critical (@master['hostname'] || @master['ip_address']) %> <%= critical (@master['port'] || @conf['port']) %>
 
 # If the master is password protected (using the "requirepass" configuration
 # directive below) it is possible to tell the slave to authenticate before
 # starting the replication synchronization process, otherwise the master will
 # refuse the slave request.
 #
-<% if @master["redis2"]["requirepass"] %>
-masterauth <%= @master["redis2"]["requirepass"] %>
+<% if @master['password'] %>
+masterauth <%= @master['password'] %>
 <% end %>
 
 # When a slave lost the connection with the master, or when the replication

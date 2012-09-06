@@ -46,10 +46,11 @@ define :redis_instance, :port => nil, :data_dir => nil, :master => nil, :service
     mode "0750"
   end
 
+  puts "PASSING MASTER=#{params[:master]}"
   conf_vars = {
     :conf => conf,
     :instance_name => instance_name,
-    :master => params[:master],
+    :master => params[:master]
   }
 
   template ::File.join(node["redis2"]["conf_dir"], "#{instance_name}.conf") do
