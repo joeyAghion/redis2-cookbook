@@ -46,7 +46,6 @@ define :redis_instance, :port => nil, :data_dir => nil, :master => nil, :service
     mode "0750"
   end
 
-  puts "PASSING MASTER=#{params[:master]}"
   conf_vars = {
     :conf => conf,
     :instance_name => instance_name,
